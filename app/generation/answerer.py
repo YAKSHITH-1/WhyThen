@@ -44,10 +44,26 @@ class AnswerGenerator:
         raw_answer = self.client.generate(QA_SYSTEM_PROMPT, user_prompt)
 
         # Citation validation: check which valid sources are cited in brackets in the answer
-        verified_sources = [s for s in sources if f"[{s.chunk_id}]" in raw_answer]
+        verified_sources = [
+            s for s in sources
+            if re.search(r"\[[^\]]*?" + re.escape(s.chunk_id) + r"[^\]]*?\]", raw_answer)
+        ]
 
         # Determine coverage
-        if "no supporting record" in raw_answer.lower() or "no evidence found" in raw_answer.lower():
+        has_abstention = (
+            "no evidence was found" in raw_answer.lower()
+            or "no supporting record" in raw_answer.lower()
+            or "do not contain any information" in raw_answer.lower()
+            or "does not contain any information" in raw_answer.lower()
+            or "not mentioned in the notes" in raw_answer.lower()
+            or "no evidence found" in raw_answer.lower()
+            or "couldn't find any information" in raw_answer.lower()
+            or "could not find any information" in raw_answer.lower()
+            or "no mention of" in raw_answer.lower()
+            or "no information" in raw_answer.lower()
+        )
+
+        if has_abstention:
             coverage = "no_evidence_found"
         elif verified_sources:
             coverage = "supported"
@@ -64,4 +80,8 @@ class AnswerGenerator:
 
 
 answer_generator = AnswerGenerator()
+
+
+
+
 

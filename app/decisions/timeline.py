@@ -1,6 +1,6 @@
 import json
 import re
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from app.schemas.chunk import ChunkRecord, SourceCitation
 from app.schemas.decision import DecisionTimelineItem, DecisionTimelineResponse
 from app.generation.llm import LLMClient, llm_client
@@ -92,31 +92,94 @@ class DecisionTimelineBuilder:
                 unresolved_questions=data.get("unresolved_questions", []),
             )
         except Exception:
-            # Fallback to heuristic chronological timeline extraction
+            # Fallback to structural heuristic timeline extraction
             return self._heuristic_fallback(topic, sorted_chunks)
+
+    def _classify_relation(self, heading: Optional[str], text: str) -> str:
+        """Classify relationship from explicit document structure and semantic cues without relying on chronological order alone."""
+        h_lower = (heading or "").lower()
+        t_lower = text.lower()
+
+        # Priority 1: Check explicit decision actions in heading first
+        if any(w in h_lower for w in ["supersedes", "supersede", "replaces", "replaced"]):
+            return "supersedes"
+        if any(w in h_lower for w in ["confirms", "confirm"]):
+            return "confirms"
+        if any(w in h_lower for w in ["revises", "revision"]):
+            return "revises"
+        if any(w in h_lower for w in ["initial choice", "initial"]):
+            return "initial_choice"
+        if any(w in h_lower for w in ["unfinished", "pending", "roadmap", "todo"]):
+            return "unfinished_plan"
+        if any(w in h_lower for w in ["proposal", "candidate", "alternative"]):
+            return "proposal"
+
+        # Priority 2: Check explicit semantic cues in text
+        if any(w in t_lower for w in ["scheduled for post-mvp", "unfinished plans", "pending decisions", "unfinished work", "still need to"]):
+            if not any(k in t_lower for k in ["decided to confirm", "decided to supersede", "decided to choose"]):
+                return "unfinished_plan"
+
+        if any(w in t_lower for w in ["we decided to supersede", "supersedes pure", "superseded by", "migrated from"]):
+            return "supersedes"
+
+        if any(w in t_lower for w in ["decided to confirm", "confirms chromadb", "confirming our", "retaining"]):
+            return "confirms"
+
+        if any(w in t_lower for w in ["revises our", "revised", "revise pure", "introducing hybrid", "switched instead of"]):
+            return "revises"
+
+        if any(w in t_lower for w in ["initial choice", "initial decision", "decided to choose", "initially chose"]):
+            return "initial_choice"
+
+        if any(w in t_lower for w in ["evaluated", "candidate", "alternative options"]):
+            return "proposal"
+
+        return "initial_choice"
 
     def _heuristic_fallback(
         self, topic: str, chunks: List[ChunkRecord]
     ) -> DecisionTimelineResponse:
         timeline_items = []
-        keywords = ["decided", "chose", "selected", "switched", "replacing", "instead of", "plan to", "will use"]
+        unresolved_questions = []
+
+        keywords = [
+            "decided", "chose", "selected", "supersede", "supersedes",
+            "confirms", "confirm", "revises", "revision", "switched",
+            "replacing", "instead of", "plan to", "will use", "unfinished", "pending"
+        ]
 
         for c in chunks:
             text_lower = c.text.lower()
-            if any(k in text_lower for k in keywords):
-                # Simple extraction of key sentence
+            h_lower = (c.heading or "").lower()
+
+            if any(k in text_lower for k in keywords) or any(k in h_lower for k in ["initial", "confirms", "revises", "supersedes", "unfinished"]):
+                # Extract key sentence
                 sentences = [s.strip() for s in re.split(r"[.!?]\s+", c.text) if s.strip()]
                 matched_sentences = [
                     s for s in sentences if any(k in s.lower() for k in keywords)
                 ]
                 dec_text = matched_sentences[0] if matched_sentences else c.text[:150]
 
-                relation = "revises" if any(w in text_lower for w in ["switched", "instead", "changed", "replace"]) else "initial_choice"
+                # Extract rationale if present
+                rationale = None
+                for s in sentences:
+                    s_low = s.lower()
+                    if s_low.startswith("the rationale is") or "because" in s_low or "rationale:" in s_low:
+                        rationale = s
+                        break
+
+                relation = self._classify_relation(c.heading, c.text)
+
+                # If classified as unfinished plan, collect into unresolved questions
+                if relation == "unfinished_plan":
+                    unresolved_questions.append(dec_text)
 
                 timeline_items.append(
                     DecisionTimelineItem(
                         event_date=c.event_date,
                         decision=dec_text,
+                        chosen_option=c.heading,
+                        rationale=rationale,
                         status_or_relation=relation,
                         citations=[
                             SourceCitation(
@@ -141,9 +204,8 @@ class DecisionTimelineBuilder:
             topic=topic,
             summary=summary,
             timeline=timeline_items,
-            unresolved_questions=[],
+            unresolved_questions=unresolved_questions,
         )
 
 
 decision_builder = DecisionTimelineBuilder()
-

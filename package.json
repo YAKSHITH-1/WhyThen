@@ -1,0 +1,13 @@
+{
+  "name": "whythen",
+  "version": "0.1.0",
+  "private": true,
+  "description": "WhyThen - A Local-First, Time-Aware Personal Memory & Decision History Assistant",
+  "scripts": {
+    "frontend:dev": "npm --prefix frontend run dev",
+    "frontend:build": "npm --prefix frontend run build",
+    "backend:dev": ".\\.venv\\Scripts\\uvicorn app.api.main:app --reload --port 8000",
+    "test:backend": ".\\.venv\\Scripts\\pytest -v",
+    "test:frontend": "npm --prefix frontend run build"
+  }
+}

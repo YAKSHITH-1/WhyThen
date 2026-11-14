@@ -7,6 +7,8 @@ from app.config import settings
 
 SCHEMA_SQL = """
 PRAGMA foreign_keys = ON;
+PRAGMA journal_mode = WAL;
+PRAGMA busy_timeout = 5000;
 
 CREATE TABLE IF NOT EXISTS documents (
     id TEXT PRIMARY KEY,
@@ -31,7 +33,8 @@ CREATE TABLE IF NOT EXISTS chunks (
     event_date TEXT,
     date_confidence TEXT,
     source_path TEXT NOT NULL,
-    title TEXT
+    title TEXT,
+    vector_synced INTEGER DEFAULT 0
 );
 
 CREATE INDEX IF NOT EXISTS idx_chunks_document_id ON chunks(document_id);
@@ -70,10 +73,14 @@ END;
 
 CREATE TABLE IF NOT EXISTS ingestion_jobs (
     id TEXT PRIMARY KEY,
+    job_type TEXT NOT NULL DEFAULT 'folder',
+    target_path TEXT,
     started_at TEXT NOT NULL,
     finished_at TEXT,
     status TEXT NOT NULL,
     files_processed INTEGER DEFAULT 0,
+    total_files INTEGER DEFAULT 0,
+    total_chunks INTEGER DEFAULT 0,
     error_summary TEXT
 );
 """
@@ -88,16 +95,38 @@ class DatabaseManager:
         return self._db_path if self._db_path is not None else settings.SQLITE_PATH
 
     def initialize(self) -> None:
-        """Create tables, triggers, and indices if they do not exist."""
+        """Create tables, triggers, and indices if they do not exist, and apply column migrations."""
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         with self.get_connection() as conn:
             conn.executescript(SCHEMA_SQL)
+            self._apply_migrations(conn)
+
+    def _apply_migrations(self, conn: sqlite3.Connection) -> None:
+        """Safely ensure new columns exist in existing databases without loss of data."""
+        # 1. Check chunks.vector_synced
+        chunk_cols = [row["name"] for row in conn.execute("PRAGMA table_info(chunks)").fetchall()]
+        if "vector_synced" not in chunk_cols:
+            conn.execute("ALTER TABLE chunks ADD COLUMN vector_synced INTEGER DEFAULT 0")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_chunks_vector_synced ON chunks(vector_synced)")
+
+        # 2. Check ingestion_jobs columns
+        job_cols = [row["name"] for row in conn.execute("PRAGMA table_info(ingestion_jobs)").fetchall()]
+        if "job_type" not in job_cols:
+            conn.execute("ALTER TABLE ingestion_jobs ADD COLUMN job_type TEXT NOT NULL DEFAULT 'folder'")
+        if "target_path" not in job_cols:
+            conn.execute("ALTER TABLE ingestion_jobs ADD COLUMN target_path TEXT")
+        if "total_files" not in job_cols:
+            conn.execute("ALTER TABLE ingestion_jobs ADD COLUMN total_files INTEGER DEFAULT 0")
+        if "total_chunks" not in job_cols:
+            conn.execute("ALTER TABLE ingestion_jobs ADD COLUMN total_chunks INTEGER DEFAULT 0")
 
     @contextmanager
     def get_connection(self) -> Generator[sqlite3.Connection, None, None]:
-        conn = sqlite3.connect(str(self.db_path))
+        conn = sqlite3.connect(str(self.db_path), timeout=5.0)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON;")
+        conn.execute("PRAGMA journal_mode = WAL;")
+        conn.execute("PRAGMA busy_timeout = 5000;")
         try:
             yield conn
             conn.commit()
@@ -109,4 +138,3 @@ class DatabaseManager:
 
 
 db_manager = DatabaseManager()
-

@@ -6,14 +6,12 @@ class TemporalReranker:
     def __init__(
         self,
         semantic_weight: float = 0.50,
-        keyword_weight: float = 0.25,
-        temporal_weight: float = 0.15,
-        source_quality_weight: float = 0.10,
+        keyword_weight: float = 0.30,
+        temporal_weight: float = 0.20,
     ):
         self.semantic_weight = semantic_weight
         self.keyword_weight = keyword_weight
         self.temporal_weight = temporal_weight
-        self.source_quality_weight = source_quality_weight
 
     def calculate_temporal_fit(
         self,
@@ -76,18 +74,10 @@ class TemporalReranker:
                 chunk.event_date, date_from, date_to, chunk.date_confidence
             )
 
-            # Source quality metric (length check, structured heading presence)
-            quality = 0.5
-            if chunk.heading:
-                quality += 0.3
-            if len(chunk.text.split()) >= 30:
-                quality += 0.2
-
             final_score = (
                 self.semantic_weight * sem_score
                 + self.keyword_weight * norm_sparse
                 + self.temporal_weight * temporal_fit
-                + self.source_quality_weight * quality
             )
 
             excerpt = chunk.text

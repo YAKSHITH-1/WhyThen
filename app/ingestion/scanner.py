@@ -41,9 +41,15 @@ class FileScanner:
         modified_files: List[Path] = []
         unchanged_files: List[Path] = []
 
+        uploads_dir = Path("data/uploads").resolve()
+
         for ext in settings.SUPPORTED_EXTENSIONS:
             for file_path in folder.rglob(f"*{ext}"):
                 if not file_path.is_file():
+                    continue
+
+                # Exclude internal managed uploads directory to prevent duplicate indexing
+                if uploads_dir.exists() and uploads_dir in file_path.resolve().parents:
                     continue
 
                 abs_path_str = str(file_path.resolve())
