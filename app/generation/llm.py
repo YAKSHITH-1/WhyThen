@@ -30,7 +30,7 @@ class LLMClient:
             "stream": False,
         }
         try:
-            with httpx.Client(timeout=90.0) as client:
+            with httpx.Client(timeout=180.0) as client:
                 res = client.post(url, json=payload)
                 res.raise_for_status()
                 return res.json().get("response", "")

@@ -335,7 +335,7 @@ export const AskWhyThenView: React.FC = () => {
                       <span>Synthesizing grounded answer from personal notes...</span>
                     </div>
                     <p className="text-xs text-slate-400 pl-8">
-                      Performing hybrid vector similarity and BM25 lexical reranking, followed by local LLM validation.
+                      Performing hybrid vector similarity and BM25 lexical reranking, followed by local Ollama generation (~45–60s on CPU).
                     </p>
                   </div>
                 ) : msg.error ? (
