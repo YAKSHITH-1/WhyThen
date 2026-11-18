@@ -60,16 +60,16 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
           <p className="text-sm text-slate-600 leading-relaxed">{message}</p>
         </div>
 
-        <div className="flex items-center justify-end gap-2 px-5 py-3 bg-slate-50 border-t border-slate-100">
+        <div className="flex items-center justify-end gap-2.5 px-5 py-3.5 bg-slate-50 border-t border-slate-100">
           <button
             onClick={onCancel}
-            className="px-3.5 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors shadow-2xs"
+            className="btn-pill-light"
           >
             {cancelText}
           </button>
           <button
             onClick={onConfirm}
-            className={`px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors shadow-2xs ${getButtonStyles()}`}
+            className={variant === 'danger' ? 'btn-pill-danger' : 'btn-pill-dark'}
           >
             {confirmText}
           </button>

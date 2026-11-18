@@ -150,7 +150,7 @@ export const DecisionTimelineView: React.FC = () => {
                 <button
                   type="submit"
                   disabled={loading || !topic.trim()}
-                  className="px-5 py-2 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:pointer-events-none transition-colors shadow-2xs flex items-center gap-1.5 flex-shrink-0"
+                  className="btn-pill-dark shrink-0"
                 >
                   {loading ? (
                     <>
@@ -178,7 +178,7 @@ export const DecisionTimelineView: React.FC = () => {
                     setTopic(qt)
                     handleFetchTimeline(qt)
                   }}
-                  className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 hover:bg-purple-50 hover:text-purple-700 border border-slate-200 hover:border-purple-200 text-slate-600 transition-colors"
+                  className="btn-pill-light !py-1 !px-3 !text-xs"
                 >
                   {qt}
                 </button>
@@ -286,7 +286,7 @@ export const DecisionTimelineView: React.FC = () => {
                               <button
                                 key={cite.chunk_id || cIdx}
                                 onClick={() => setSelectedCitation(cite)}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-purple-50 text-slate-700 hover:text-purple-800 rounded text-xs border border-slate-200 hover:border-purple-200 transition-colors"
+                                className="btn-pill-light !py-1 !px-3 !text-xs !bg-slate-50"
                               >
                                 <ExternalLink className="w-3 h-3 text-slate-400" />
                                 <span className="font-medium truncate max-w-xs">

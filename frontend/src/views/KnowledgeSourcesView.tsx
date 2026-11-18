@@ -246,10 +246,10 @@ export const KnowledgeSourcesView: React.FC = () => {
         actions={
           <button
             onClick={() => fetchDocuments(page * pageSize)}
-            className="text-xs text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-md bg-white border border-slate-200 hover:bg-slate-50 transition-colors shadow-2xs flex items-center gap-1.5"
+            className="btn-pill-light"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            Refresh
+            <span>Refresh</span>
           </button>
         }
       />
@@ -323,7 +323,7 @@ export const KnowledgeSourcesView: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isScanningFolder || !folderPath.trim()}
-                  className="w-full py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none transition-colors shadow-2xs flex items-center justify-center gap-2"
+                  className="w-full btn-pill-dark !py-2.5"
                 >
                   {isScanningFolder ? (
                     <>
@@ -433,7 +433,7 @@ export const KnowledgeSourcesView: React.FC = () => {
                 type="button"
                 onClick={handleStartUpload}
                 disabled={isUploading || selectedFiles.length === 0}
-                className="w-full py-2 bg-emerald-600 text-white text-xs font-medium rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:pointer-events-none transition-colors shadow-2xs flex items-center justify-center gap-2"
+                className="w-full btn-pill-dark !py-2.5"
               >
                 {isUploading ? (
                   <>
@@ -579,7 +579,7 @@ export const KnowledgeSourcesView: React.FC = () => {
               <button
                 onClick={() => setPage((p) => Math.max(0, p - 1))}
                 disabled={page === 0}
-                className="px-2.5 py-1 bg-white border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none transition-colors flex items-center gap-1 shadow-2xs"
+                className="btn-pill-light !py-1 !px-3"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
                 Previous
@@ -587,7 +587,7 @@ export const KnowledgeSourcesView: React.FC = () => {
               <button
                 onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                 disabled={page >= totalPages - 1}
-                className="px-2.5 py-1 bg-white border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none transition-colors flex items-center gap-1 shadow-2xs"
+                className="btn-pill-light !py-1 !px-3"
               >
                 Next
                 <ChevronRight className="w-3.5 h-3.5" />

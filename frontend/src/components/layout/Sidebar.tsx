@@ -92,13 +92,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ className }) => {
       <div>
         <div className="px-6 py-5 border-b border-slate-800/80">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 font-bold text-base">
+            <div className="w-8 h-8 rounded-full bg-white text-slate-950 flex items-center justify-center shadow-[0_2px_10px_rgba(255,255,255,0.25)] font-bold text-sm">
               W
             </div>
             <div>
               <h1 className="text-base font-bold text-white tracking-tight flex items-center gap-1.5">
                 WhyThen
-                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/[0.08] text-slate-200 border border-white/15">
                   MVP
                 </span>
               </h1>
@@ -110,7 +110,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ className }) => {
         </div>
 
         {/* Navigation Links */}
-        <nav className="p-3 space-y-1">
+        <nav className="p-3 space-y-1.5">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
@@ -118,10 +118,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ className }) => {
               end={item.to === '/'}
               className={({ isActive }) =>
                 cn(
-                  'flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                  'flex items-center gap-3 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200',
                   isActive
-                    ? 'bg-blue-600 text-white shadow-xs'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                    ? 'glass-surface-active'
+                    : 'text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent'
                 )
               }
             >
@@ -129,12 +129,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ className }) => {
                 <>
                   <item.icon
                     className={cn(
-                      'w-4 h-4 flex-shrink-0',
-                      isActive ? 'text-white' : 'text-slate-400'
+                      'w-4 h-4 flex-shrink-0 transition-all duration-200',
+                      isActive ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.7)] scale-105' : 'text-slate-400'
                     )}
                   />
                   <div className="flex flex-col text-left">
-                    <span>{item.label}</span>
+                    <span className={cn(isActive && 'tracking-wide font-medium')}>{item.label}</span>
                   </div>
                 </>
               )}

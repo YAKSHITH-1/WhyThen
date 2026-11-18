@@ -463,12 +463,12 @@ export const SettingsView: React.FC = () => {
             </div>
 
             {/* Actions Bar */}
-            <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
               <button
                 type="button"
                 onClick={() => setShowManualReindexModal(true)}
                 disabled={reindexing}
-                className="px-4 py-2 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-300 rounded-lg hover:bg-amber-100 transition-colors shadow-2xs flex items-center gap-1.5"
+                className="btn-pill-light !text-amber-700 !border-amber-200 hover:!bg-amber-50"
               >
                 {reindexing ? (
                   <>
@@ -486,7 +486,7 @@ export const SettingsView: React.FC = () => {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-5 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-2xs flex items-center gap-1.5"
+                className="btn-pill-dark"
               >
                 {saving ? (
                   <>

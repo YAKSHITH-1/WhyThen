@@ -19,7 +19,7 @@ export const Header: React.FC<HeaderProps> = ({ title, subtitle, actions }) => {
 
       <div className="flex items-center gap-3">
         {actions}
-        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium border border-slate-200">
+        <div className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 text-slate-700 text-xs font-medium border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
           <Sparkles className="w-3.5 h-3.5 text-blue-600" />
           <span>Local Privacy Active</span>
         </div>

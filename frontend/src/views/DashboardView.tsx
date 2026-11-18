@@ -82,9 +82,9 @@ export const DashboardView: React.FC = () => {
         actions={
           <button
             onClick={fetchSummary}
-            className="text-xs text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-md bg-white border border-slate-200 hover:bg-slate-50 transition-colors shadow-2xs"
+            className="btn-pill-light"
           >
-            Refresh
+            <span>Refresh</span>
           </button>
         }
       />
@@ -188,23 +188,24 @@ export const DashboardView: React.FC = () => {
             </p>
           </div>
 
-          <form onSubmit={handleQuickSearch} className="mt-4 flex gap-2">
+          <form onSubmit={handleQuickSearch} className="mt-4 flex gap-2.5">
             <div className="relative flex-1">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search past notes (e.g., 'Why did we choose SQLite?', 'FastAPI vs Streamlit')..."
-                className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all text-slate-900 placeholder:text-slate-400"
+                className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 focus:bg-white transition-all text-slate-900 placeholder:text-slate-400"
               />
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
             </div>
             <button
               type="submit"
               disabled={isSearching || !searchQuery.trim()}
-              className="px-4 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none transition-colors shadow-2xs flex items-center gap-1.5"
+              className="btn-pill-dark"
             >
-              {isSearching ? 'Searching...' : 'Search'}
+              <span>{isSearching ? 'Searching...' : 'Search'}</span>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
             </button>
           </form>
 
